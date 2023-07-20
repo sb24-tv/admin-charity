@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from "react";
 import APIService from "../../service/APIService.ts";
 import { Dialog, Transition } from '@headlessui/react'
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { StatusCodes, searchDataById } from "../../enum/index.ts";
+import { StatusCodes, searchDataById } from "../../enum";
 import { FiChevronDown, FiCheck } from "react-icons/fi";
 
 interface PropsCategory {
@@ -21,7 +21,7 @@ export default function FilterCategory({ show, onCloseFilterCategory }: PropsCat
     const navigate = useNavigate();
 
     useEffect(() => {
-        APIService.get(`subcat`).then((response: any) => {
+        APIService.get(`category/front/sub`).then((response: any) => {
             if (response.status === StatusCodes.OK) {
                 setCategory(response.data.data);
             }
@@ -104,7 +104,7 @@ export default function FilterCategory({ show, onCloseFilterCategory }: PropsCat
                                                             return item.status === true && (
                                                                 <React.Fragment key={index}>
                                                                     <div
-                                                                        className={`relative pl-4 py-2 p-1 my-0.5 rounded-md bg-[#f4f5f6] dark:bg-gray-box ${item.subcategories.length > 0 ? 'cursor-pointer' : 'cursor-default'}`}
+                                                                        className={`relative pl-4 py-2 p-1 my-0.5 rounded-md bg-[#f4f5f6] dark:bg-gray-box ${item.subCategories.length > 0 ? 'cursor-pointer' : 'cursor-default'}`}
                                                                         onClick={() => {
                                                                             handleCategory(item.id);
                                                                         }}
@@ -113,7 +113,7 @@ export default function FilterCategory({ show, onCloseFilterCategory }: PropsCat
                                                                             {item.name}
                                                                         </span>
                                                                         {
-                                                                            item.subcategories.length > 0 &&
+                                                                            item.subCategories.length > 0 &&
                                                                             <span
                                                                                 className={`absolute top-1/2 right-4 z-30 -translate-y-1/2 ${openId === item.id ? 'transform rotate-180 transition duration-500' : 'transform rotate-0 transition duration-500'}`}
                                                                             >
@@ -122,10 +122,10 @@ export default function FilterCategory({ show, onCloseFilterCategory }: PropsCat
                                                                         }
                                                                     </div>
                                                                     {
-                                                                        openId === item.id && item.subcategories.length > 0 &&
+                                                                        openId === item.id && item.subCategories.length > 0 &&
                                                                         <div className="flex flex-col gap-1.5 pl-4">
                                                                             {
-                                                                                item.subcategories.map((sub: any, index: number) => {
+                                                                                item.subCategories.map((sub: any, index: number) => {
                                                                                     return sub.status === true && (
                                                                                         <React.Fragment key={index}>
                                                                                             <div className="relative pl-6 p-0.5 my-0.5 rounded-md">
@@ -157,7 +157,7 @@ export default function FilterCategory({ show, onCloseFilterCategory }: PropsCat
                                                                                                 </label>
                                                                                             </div>
                                                                                             {
-                                                                                                sub.subcategories.map((sub2: any, index: number) => {
+                                                                                                sub.subCategories.map((sub2: any, index: number) => {
                                                                                                     return sub2.status === true && (
                                                                                                         <React.Fragment key={index}>
                                                                                                             <div className="relative pl-8 p-0.5 my-0.5 rounded-md">
@@ -190,7 +190,7 @@ export default function FilterCategory({ show, onCloseFilterCategory }: PropsCat
                                                                                                                 </label>
                                                                                                             </div>
                                                                                                             {
-                                                                                                                sub2.subcategories.map((sub3: any, index: number) => {
+                                                                                                                sub2.subCategories.map((sub3: any, index: number) => {
                                                                                                                     return sub3.status === true && (
                                                                                                                         <div className="relative pl-10 p-0.5 my-0.5 rounded-md" key={index}>
                                                                                                                             <label

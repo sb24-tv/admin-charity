@@ -2,7 +2,7 @@ import { Fragment, useRef, useState } from "react";
 import APIService from "../../service/APIService.ts";
 import { Dialog, Transition } from '@headlessui/react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa6";
-import { StatusCodes } from "../../enum/index.ts";
+import { StatusCodes } from "../../enum";
 import { toast } from 'react-toastify';
 
 interface MyComponentProps {
@@ -20,7 +20,6 @@ function CreateUser(props: MyComponentProps) {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [usernameExist, setUsernameExist] = useState<boolean>(false);
     const [usernameExistMessage, setUsernameExistMessage] = useState<string>('');
-
     const nameRef = useRef<any>(null);
     const usernameRef = useRef<any>(null);
     const passwordRef = useRef<any>(null);
@@ -64,7 +63,7 @@ function CreateUser(props: MyComponentProps) {
             name: nameRef?.current.value,
             username: usernameRef?.current.value,
             password: passwordRef?.current.value,
-            activate: enabled ? 1 : 0
+            status: enabled
         }
         APIService.post('users/signup', data).then((response: any) => {
             if (response.status === StatusCodes.CREATED) {
@@ -75,7 +74,7 @@ function CreateUser(props: MyComponentProps) {
                 setUsernameExist(true);
                 setUsernameExistMessage(response.data.message);
             }
-        }).catch((error: any) => {
+        }).catch(() => {
             notifyError();
         }
         );
@@ -151,7 +150,8 @@ function CreateUser(props: MyComponentProps) {
                                                 type="text"
                                                 placeholder="Username"
                                                 ref={usernameRef}
-                                                onChange={() => { setRequiredUsername(false), setUsernameExist(false) }}
+                                                onChange={() => { // noinspection CommaExpressionJS
+                                                    setRequiredUsername(false), setUsernameExist(false) }}
                                                 className={`mt-3 w-full rounded-lg bg-input py-3 px-5 font-medium outline-none transition ${requiredUsername || usernameExist ? 'border-meta-1 border-2 dark:border-meta-1' : 'border-2 border-input'} dark:border-form-strokedark dark:bg-form-input dark:disabled:bg-black dark:text-white`}
                                             />
                                             {

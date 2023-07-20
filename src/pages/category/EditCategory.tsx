@@ -5,34 +5,21 @@ import { useSearchParams } from "react-router-dom";
 import { StatusCodes } from "../../enum";
 import { toast } from 'react-toastify';
 import { FaCircleCheck, FaCircleExclamation } from "react-icons/fa6";
-import NoImage from "../../images/logo/black-and-white.png"
 interface MyComponentProps {
     show: boolean;
     onCloseEditCategory: any;
     dataForEditCategory: any;
     updateCategory: () => void;
 }
-function getURL() {
-    // @ts-ignore
-    if (import.meta.env.MODE === "production") {
-        // @ts-ignore
-        return import.meta.env.VITE_API_PROD
-    } else {
-        // @ts-ignore
-        return import.meta.env.VITE_API_DEV
-    }
-}
+
 export default function EditCategory(props: MyComponentProps) {
     const { show, onCloseEditCategory, dataForEditCategory } = props;
     const [categorySelected, setCategorySelected] = useState<any>({});
     const [searchParams] = useSearchParams();
     const getFirstCategory = searchParams.get('c1');
-    const getSecondCategory = searchParams.get('c2');
-    const getLastCategory = searchParams.get('c3');
     const nameRef = useRef<any>(null);
     const slugRef = useRef<any>(null);
     const orderingRef = useRef<any>(null);
-    const imageRef = useRef<any>(null);
     const [onLoading, setOnLoading] = useState<boolean>(false);
     const [messageSlugExist, setMessageSlugExist] = useState<string>('');
     const [messageSlugAvailable, setMessageSlugAvailable] = useState<string>('');
@@ -68,31 +55,13 @@ export default function EditCategory(props: MyComponentProps) {
             theme: "light",
         });
     };
-    const notifyErrorImage = () => {
-        toast.error('Allowed only png file', {
-            position: "bottom-left",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-        });
-    };
-
-    const [selectFile, setSelectedFile] = useState<File | null>(null);
-    const [previewURL, setPreviewURL] = useState<string | null>(null);
+    
     const [requiredName, setRequiredName] = useState<boolean>(false);
-    const [requiredImage, setRequiredImage] = useState<boolean>(false);
 
     const onClose = () => {
         onCloseEditCategory();
-        setSelectedFile(null);
-        setPreviewURL(null);
         setRequiredName(false);
         setCategorySelected(dataForEditCategory);
-        setRequiredImage(false);
         setDisableButton(false);
         setOnLoading(false);
         setMessageSlugExist('');
@@ -101,45 +70,36 @@ export default function EditCategory(props: MyComponentProps) {
 
     const handleSubmit = async () => {
         const nameValue = nameRef.current?.value
-        const imageValue = imageRef.current?.value
-        if (!nameValue || !imageValue && !getFirstCategory && !getSecondCategory && !getLastCategory && !dataForEditCategory.catphoto) {
+        if (!nameValue) {
             if (!nameValue) setRequiredName(true);
-            if (!imageValue && !getFirstCategory && !getSecondCategory && !getLastCategory && !dataForEditCategory.catphoto) setRequiredImage(true);
             return;
-        };
-        if (selectFile || dataForEditCategory.catphoto) {
-            const formData = new FormData();
-            const statusCategory = categorySelected.status;
+        }
+        if ( dataForEditCategory.slug !== null ) {
             const id = dataForEditCategory.id;
+            const statusCategory = categorySelected.status;
             const data = {
                 name: nameRef.current?.value,
                 slug: slugRef.current?.value,
-                parentCategoryId: null,
+                parentCategoryId: 'null',
                 ordering: orderingRef.current?.value,
-                status: statusCategory ? 1 : 0
+                status: statusCategory
             }
-
-            formData.append('catphoto', selectFile || dataForEditCategory.catphoto);
-            formData.append('name', data.name);
-            formData.append('slug', data.slug);
-            formData.append('parentCategoryId', data.parentCategoryId as any);
-            formData.append('ordering', data.ordering);
-            formData.append('status', data.status as any);
-
-            APIService.updateFormData(`category/${id}`, formData).then((response: any) => {
-                if (response.status === StatusCodes.OK) {
-                    notify();
-                    onCloseEditCategory();
-                    props.updateCategory();
-                    setSelectedFile(null);
-                    setPreviewURL(null);
-                    setRequiredName(false);
-                    setCategorySelected(dataForEditCategory);
-                    setMessageSlugAvailable('');
-                    setMessageSlugExist('');
+            APIService.put(`category/${id}`, data).then((response: any) => {
+                    if (response.status === StatusCodes.OK) {
+                        notify();
+                        onCloseEditCategory();
+                        props.updateCategory();
+                        setRequiredName(false);
+                        setCategorySelected(dataForEditCategory);
+                        setMessageSlugAvailable('');
+                        setMessageSlugExist('');
+                    }
                 }
-            }
+            ).catch(() => {
+                    notifyError();
+                }
             );
+        
         } else {
             const id = dataForEditCategory.id;
             const statusCategory = categorySelected.status;
@@ -154,8 +114,6 @@ export default function EditCategory(props: MyComponentProps) {
                     notify();
                     onCloseEditCategory();
                     props.updateCategory();
-                    setSelectedFile(null);
-                    setPreviewURL(null);
                     setRequiredName(false);
                     setCategorySelected(dataForEditCategory);
                     setMessageSlugAvailable('');
@@ -169,21 +127,7 @@ export default function EditCategory(props: MyComponentProps) {
         }
 
     }
-    const handleFileChange = (event: any) => {
-        setRequiredImage(false);
-        const file = event.target.files && event.target.files[0];
-        if (file) {
-            const fileName = file.name;
-            const lastDot = fileName.lastIndexOf('.');
-            const ext = fileName.substring(lastDot + 1);
-            if (ext === 'png') {
-                setSelectedFile(file);
-                setPreviewURL(URL.createObjectURL(file));
-            } else {
-                notifyErrorImage();
-            }
-        }
-    };
+    
     const handleNameChange = (event: any) => {
         setMessageSlugExist('');
         setMessageSlugAvailable('');
@@ -230,9 +174,7 @@ export default function EditCategory(props: MyComponentProps) {
             .replace(/--+/g, '-') // Replace multiple hyphens with single hyphen
             .replace(/_+/g, '');
     };
-    const onError = (e: any) => {
-        e.target.src = NoImage;
-    }
+
     return (
         <Transition appear show={show} as={Fragment}>
             <Dialog as="div" className="relative z-999" onClose={onClose}>
@@ -263,7 +205,7 @@ export default function EditCategory(props: MyComponentProps) {
                                     as="h3"
                                     className="text-[20px] font-medium leading-6 text-black-box text-center dark:text-white2"
                                 >
-                                    Create Category
+                                    Update Category
                                 </Dialog.Title>
                                 <div className="rounded-sm dark:border-strokedark dark:bg-boxdark">
                                     <div className="flex flex-col gap-5.5 p-6.5">
@@ -288,7 +230,7 @@ export default function EditCategory(props: MyComponentProps) {
                                             }
                                         </div>
                                         {
-                                            !getFirstCategory && !getSecondCategory && !getLastCategory &&
+                                            !getFirstCategory &&
                                             <div className="relative">
                                                 <label className="font-medium text-black dark:text-white">
                                                     Slug
@@ -362,7 +304,8 @@ export default function EditCategory(props: MyComponentProps) {
                                                                 id="toggle1"
                                                                 className="sr-only"
                                                                 onChange={() => {
-                                                                    setCategorySelected({ ...categorySelected, status: categorySelected?.status === true ? false : true });
+                                                                    setCategorySelected({ ...categorySelected, status: categorySelected?.status !== true });
+                                                                    // setCategorySelected({ ...categorySelected, status: categorySelected?.status === true ? false : true });
                                                                 }}
                                                             />
                                                             <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]"></div>
@@ -372,54 +315,13 @@ export default function EditCategory(props: MyComponentProps) {
                                                 </div>
                                             </div>
                                         </div>
-                                        {
-                                            !getFirstCategory && !getSecondCategory && !getLastCategory &&
-                                            <div className="relative">
-                                                <label className="font-medium text-black dark:text-white">Image <span className="text-meta-1">*</span></label>
-                                                <div className={`relative mt-3 mb-2 block w-full duration-150 transition-all cursor-pointer appearance-none rounded border-2 border-dashed bg-input py-4 px-4 dark:bg-meta-4 sm:py-7.5 ${requiredImage ? 'border-meta-1' : 'border-bodydark hover:border-primary'} ${previewURL ? 'border-primary' : ''}`} >
-                                                    <input
-                                                        type="file"
-                                                        accept="image/png"
-                                                        ref={imageRef}
-                                                        className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
-                                                        onChange={handleFileChange}
-                                                    />
-                                                    <div className="flex flex-col items-center justify-center space-y-3">
-                                                        {
-                                                            dataForEditCategory?.catphoto && !previewURL && (
-                                                                <img
-                                                                    src={getURL() + '/public/images/' + dataForEditCategory?.catphoto}
-                                                                    alt="Uploaded Image Preview"
-                                                                    className="h-30 w-30 object-contain rounded-lg"
-                                                                    onError={onError}
-                                                                />
-                                                            )
-                                                        }
-                                                        {
-                                                            previewURL && (
-                                                                <img
-                                                                    src={previewURL}
-                                                                    alt="Uploaded Image Preview"
-                                                                    className="h-30 w-30 object-contain rounded-lg"
-                                                                />
-                                                            )
-                                                        }
-                                                    </div>
-                                                </div>
-                                                {
-                                                    requiredImage &&
-                                                    <span className="text-meta-1 text-sm absolute">
-                                                        Image is required
-                                                    </span>
-                                                }
-                                            </div>
-                                        }
+                                       
                                         <div className="flex justify-end items-center">
                                             <button className="flex justify-center bg-transparent border border-meta-9 px-8 py-2 rounded-md font-medium text-black dark:text-white mr-3.5" onClick={onClose}>
                                                 Cancel
                                             </button>
                                             {
-                                                disableButton && !getFirstCategory && !getSecondCategory && !getLastCategory ?
+                                                disableButton && !getFirstCategory ?
                                                     <button className="flex justify-center bg-primary/60 px-8 py-2 rounded-md font-medium text-gray" disabled>
                                                         Update
                                                     </button>

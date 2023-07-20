@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import APIService from "../../service/APIService.ts";
 import { Dialog, Transition } from '@headlessui/react'
-import { StatusCodes } from "../../enum/index.ts";
+import { StatusCodes } from "../../enum";
 import { toast } from 'react-toastify';
 
 interface MyComponentProps {
@@ -55,7 +55,7 @@ function EditUser(props: MyComponentProps) {
         const name = nameRef.current?.value;
         const username = usernameRef.current?.value;
         const id = dataForEditUser?.id;
-        const status = userSelected?.activate;
+        const status = userSelected?.status;
         if (!name || !username) {
             if (!name) setRequiredName(true);
             if (!username) setRequiredUsername(true);
@@ -64,7 +64,7 @@ function EditUser(props: MyComponentProps) {
         const data = {
             name: nameRef?.current.value,
             username: usernameRef?.current.value,
-            activate: status
+            status: status
         }
         APIService.put(`users/${id}`, data).then((response: any) => {
             if (response.status === StatusCodes.OK) {
@@ -75,7 +75,7 @@ function EditUser(props: MyComponentProps) {
                 setUsernameExist(true);
                 setMessage(response.data.message);
             }
-        }).catch((error: any) => {
+        }).catch(() => {
             notifyError();
         }
         )
@@ -203,12 +203,12 @@ function EditUser(props: MyComponentProps) {
                                                                         id="toggle1"
                                                                         className="sr-only"
                                                                         onChange={() => {
-                                                                            setUserSelected({ ...userSelected, activate: userSelected?.activate === 1 ? 0 : 1 })
+                                                                            setUserSelected({ ...userSelected, status: userSelected?.status !== true })
                                                                         }}
                                                                     />
                                                                     <div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]"></div>
                                                                     <div
-                                                                        className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${userSelected?.activate === 0 ? '' : '!right-1 !translate-x-full !bg-primary dark:!bg-white'
+                                                                        className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${userSelected?.status === false ? '' : '!right-1 !translate-x-full !bg-primary dark:!bg-white'
                                                                             }`}
                                                                     ></div>
                                                                 </div>

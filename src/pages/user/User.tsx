@@ -4,7 +4,7 @@ import { FaRegPenToSquare, FaKey } from "react-icons/fa6";
 import ChangePassword from "./ChangePassword.tsx";
 import CreateUser from "./CreateUser.tsx";
 import EditUser from "./EditUser.tsx";
-import { StatusCodes } from "../../enum/index.ts";
+import { StatusCodes } from "../../enum";
 import Loader from "../../common/Loader/index.tsx";
 
 const User = () => {
@@ -124,7 +124,7 @@ const User = () => {
                                             <td className="py-4 px-4 dark:border-strokedark">
                                                 <p className="text-black dark:text-white text-base">
                                                     {
-                                                        new Date(user.createdAt).toLocaleDateString("en-US", {
+                                                        new Date(user.createAt).toLocaleDateString("en-US", {
                                                             weekday: "short",
                                                             year: "numeric",
                                                             month: "short",
@@ -135,7 +135,7 @@ const User = () => {
                                             </td>
                                             <td className="py-4 px-4 dark:border-strokedark">
                                                 {
-                                                    user.activate === 1 ? (
+                                                    user.status === true ? (
                                                         <p className="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">
                                                             Active
                                                         </p>

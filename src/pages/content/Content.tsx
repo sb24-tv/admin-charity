@@ -4,7 +4,7 @@ import Pagination from "../../components/Pagination.tsx";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import { FiSearch, FiX, FiFilter, FiTrash2 } from "react-icons/fi";
-import { StatusCodes } from '../../enum/index.ts';
+import { StatusCodes } from '../../enum';
 import NoArticle from "../../images/logo/article.png"
 import Filter from "../../images/logo/filter.png"
 import NoResult from "../../images/logo/no-results.png"
@@ -109,7 +109,8 @@ const Content = () => {
             document.removeEventListener('keydown', handleKeyPress);
         };
     }, [searchKey]);
-
+    
+    // noinspection XmlDeprecatedElement,JSDeprecatedSymbols
     return (
 
         loading ?
@@ -224,7 +225,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 pl-9 max-w-[300px] dark:border-strokedark xl:pl-11">
                                                             <h5 className="font-medium text-black dark:text-white">
-                                                                {item.title}
+                                                                {item.name}
                                                             </h5>
                                                         </td>
                                                         <td className="py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
@@ -239,7 +240,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             <p className="text-black dark:text-white">
-                                                                {new Date(item.createdAt).toLocaleDateString("en-US", {
+                                                                {new Date(item.createAt).toLocaleDateString("en-US", {
                                                                     weekday: "short",
                                                                     year: "numeric",
                                                                     month: "short",
@@ -250,7 +251,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             {
-                                                                item.allowPublic === true ? (
+                                                                item.status === true ? (
                                                                     <p className="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">
                                                                         Active
                                                                     </p>
@@ -286,8 +287,6 @@ const Content = () => {
                                         )
                                     }
                                     {
-                                    }
-                                    {
                                         searchKey && !categoryIdParam &&
                                         (
                                             searchResult.length > 0 ?
@@ -308,7 +307,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 pl-9 max-w-[300px] dark:border-strokedark xl:pl-11">
                                                             <h5 className="font-medium text-black dark:text-white">
-                                                                {item.title}
+                                                                {item.name}
                                                             </h5>
                                                         </td>
                                                         <td className="py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
@@ -323,7 +322,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             <p className="text-black dark:text-white">
-                                                                {new Date(item.createdAt).toLocaleDateString("en-US", {
+                                                                {new Date(item.createAt).toLocaleDateString("en-US", {
                                                                     weekday: "short",
                                                                     year: "numeric",
                                                                     month: "short",
@@ -334,7 +333,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             {
-                                                                item.allowPublic === true ? (
+                                                                item.status === true ? (
                                                                     <p className="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">
                                                                         Active
                                                                     </p>
@@ -389,7 +388,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 pl-9 max-w-[300px] dark:border-strokedark xl:pl-11">
                                                             <h5 className="font-medium text-black dark:text-white">
-                                                                {item.title}
+                                                                {item.name}
                                                             </h5>
                                                         </td>
                                                         <td className="py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
@@ -404,7 +403,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             <p className="text-black dark:text-white">
-                                                                {new Date(item.createdAt).toLocaleDateString("en-US", {
+                                                                {new Date(item.createAt).toLocaleDateString("en-US", {
                                                                     weekday: "short",
                                                                     year: "numeric",
                                                                     month: "short",
@@ -415,7 +414,7 @@ const Content = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             {
-                                                                item.allowPublic === true ? (
+                                                                item.status === true ? (
                                                                     <p className="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">
                                                                         Active
                                                                     </p>

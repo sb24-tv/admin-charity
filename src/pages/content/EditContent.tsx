@@ -3,13 +3,13 @@ import APIService from "../../service/APIService.ts";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { StatusCodes, searchDataById } from '../../enum';
 import { toast } from 'react-toastify';
-import { FaCaretDown, FaCheck } from "react-icons/fa6";
+import { FaCaretDown } from "react-icons/fa6";
 import 'react-quill/dist/quill.snow.css';
 import MyEditor from "./MyEditor"
 import Loader from "../../common/Loader/index.tsx";
 
 const EditContent = () => {
-	const titleRef = useRef<any>(null);
+	const nameRef = useRef<any>(null);
 	const [requiredTitle, setRequiredTitle] = useState<boolean>(false);
 	const [requiredCategory, setRequiredCategory] = useState<boolean>(false);
 	const [requiredBody, setRequiredBody] = useState<boolean>(false);
@@ -74,26 +74,27 @@ const EditContent = () => {
 		});
 	}, []);
 	
+	// noinspection JSDeprecatedSymbols
 	const getParentId = contentById.category ? searchDataById(contentById?.category?.id, category) : null;
 	const categoryId = getParentId ? category[getParentId.position[0]].id : null;
 	
 	const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
 	
 	const handleSubmit = async () => {
-		const title = titleRef.current?.value;
-		const body = editorHtml || contentById?.body;
-		const allowPublic = contentSelected?.allowPublic;
-		if (!title ||  categorySelected === 0) {
-			if (!title) setRequiredTitle(true);
+		const name = nameRef.current?.value;
+		const description = editorHtml || contentById?.body;
+		const status = contentSelected?.status;
+		if (!name ||  categorySelected === 0) {
+			if (!name) setRequiredTitle(true);
 			if (categorySelected === 0) setRequiredCategory(true);
 			// if (!body) setRequiredBody(true);
 			return;
 		}
 		const data = {
-			title: titleRef.current?.value,
+			name: nameRef.current?.value,
 			categoryId: categorySelected as number,
-			body: body,
-			allowPublic: allowPublic,
+			description: description,
+			status: status,
 			userId: userId as number,
 		};
 		APIService.put(`content/${id}`, data).then((response: any) => {
@@ -125,6 +126,7 @@ const EditContent = () => {
 	useEffect(() => {
 		setContentSelected(contentById);
 		setOpenId(categoryId)
+		// noinspection JSDeprecatedSymbols
 		setCategorySelected(contentById?.category?.id);
 	}, [contentById]);
 
@@ -157,7 +159,7 @@ const EditContent = () => {
 										type="text"
 										placeholder="Title"
 										name="title"
-										ref={titleRef}
+										ref={nameRef}
 										defaultValue={contentById?.title}
 										onChange={() => setRequiredTitle(false)}
 										className={`w-full rounded-md border bg-input py-3 px-5 font-medium outline-none transition disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input ${requiredTitle ? 'border-meta-1 focus:border-meta-1' : 'border-input'}`}
@@ -207,7 +209,7 @@ const EditContent = () => {
 												return item.status === true && (
 													<React.Fragment key={index}>
 														<div
-															className={`relative pl-4 py-2 p-1 my-0.5 rounded-md bg-[#f4f5f6] dark:bg-gray-box ${item.subcategories.length > 0 ? 'cursor-pointer' : 'cursor-default'}`}
+															className={`relative pl-4 py-2 p-1 my-0.5 rounded-md bg-[#f4f5f6] dark:bg-gray-box ${item.subCategories.length > 0 ? 'cursor-pointer' : 'cursor-default'}`}
 															onClick={() => {
 																handleCategory(item.id);
 															}}
@@ -216,7 +218,7 @@ const EditContent = () => {
                                                                 {item.name}
                                                             </span>
 															{
-																item.subcategories.length > 0 &&
+																item.subCategories.length > 0 &&
                                                                 <span
                                                                     className={`absolute top-1/2 right-4 z-30 -translate-y-1/2 ${openId === item.id ? 'transform rotate-180 transition duration-500' : 'transform rotate-0 transition duration-500'}`}
                                                                 >
@@ -225,7 +227,7 @@ const EditContent = () => {
 															}
 														</div>
 														{
-															openId === item.id && item.subcategories.length > 0 &&
+															openId === item.id && item.subCategories.length > 0 &&
                                                             <div className="flex flex-col gap-1.5 pl-4">
 																{
 																	item.subcategories.map((sub: any, index: number) => {
@@ -259,77 +261,7 @@ const EditContent = () => {
                                                                                         </span>
 																					</label>
 																				</div>
-																				{
-																					sub.subcategories.map((sub2: any, index: number) => {
-																							return sub2.status === true && (
-																								<React.Fragment key={index}>
-																									<div className="relative pl-8 p-0.5 my-0.5 rounded-md">
-																										<label
-																											htmlFor={`checkbox-${sub2.id}`}
-																											className="flex cursor-pointer select-none items-center"
-																										>
-																											<div className="relative">
-																												<input
-																													type="checkbox"
-																													id={`checkbox-${sub2.id}`}
-																													className="sr-only"
-																													onChange={() => {
-																														onClickSelectCategory(sub2.id)
-																													}}
-																												/>
-																												<div className={`mr-4 flex h-5 w-5 items-center justify-center rounded-full border ${categorySelected === sub2.id && 'border-primary'
-																												}`}
-																												>
-                                                                                                                <span className={`h-2.5 w-2.5 rounded-full bg-transparent ${categorySelected === sub2.id && '!bg-primary'
-                                                                                                                }`}
-                                                                                                                >
-                                                                                                                    {' '}
-                                                                                                                </span>
-																												</div>
-																											</div>
-																											<span className="text-warning font-medium">
-                                                                                                            {sub2.name}
-                                                                                                        </span>
-																										</label>
-																									</div>
-																									{
-																										sub2.subcategories.map((sub3: any, index: number) => {
-																												return sub3.status === true && (
-																													<div className="relative pl-10 p-0.5 my-0.5 rounded-md" key={index}>
-																														<label
-																															htmlFor={`checkbox-${sub3.id}`}
-																															className="flex cursor-pointer select-none items-center"
-																														>
-																															<div className="relative">
-																																<input
-																																	type="checkbox"
-																																	id={`checkbox-${sub3.id}`}
-																																	className="sr-only"
-																																	onChange={() => {
-																																		onClickSelectCategory(sub3.id);
-																																	}}
-																																/>
-																																<div className={`mr-4 flex h-5 w-5 items-center justify-center rounded border ${categorySelected === sub3.id && 'border-primary bg-gray dark:bg-transparent'
-																																}`} >
-                                                                                                                            <span className={`opacity-0 ${categorySelected === sub3.id && '!opacity-100'}`}>
-                                                                                                                                <FaCheck className="fill-primary" />
-                                                                                                                            </span>
-																																</div>
-																															</div>
-																															<span className="font-medium text-gray-box-2 dark:text-white">
-                                                                                                                        {sub3.name}
-                                                                                                                    </span>
-																														</label>
-																													</div>
-																												)
-																											}
-																										)
-																									}
-																								</React.Fragment>
-																							)
-																						}
-																					)
-																				}
+																				
 																			</React.Fragment>
 																		)
 																	})
@@ -362,13 +294,13 @@ const EditContent = () => {
 												onChange={() => {
 													setContentSelected({
 														...contentSelected,
-														allowPublic: contentSelected?.allowPublic === true ? false : true
+														status: contentSelected?.status !== true
 													})
 												}}
 											/>
 											<div className="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]"></div>
 											<div
-												className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${contentSelected.allowPublic === false ? '' : '!right-1 !translate-x-full !bg-primary dark:!bg-white'
+												className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition ${contentSelected.status === false ? '' : '!right-1 !translate-x-full !bg-primary dark:!bg-white'
 												}`}
 											></div>
 										</div>

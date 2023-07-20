@@ -2,7 +2,7 @@ import { Fragment, useRef, useState } from "react";
 import APIService from "../../service/APIService.ts";
 import { Dialog, Transition } from '@headlessui/react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa6";
-import { StatusCodes } from "../../enum/index.ts";
+import { StatusCodes } from "../../enum";
 import { toast } from 'react-toastify';
 
 interface MyComponentProps {
@@ -114,7 +114,7 @@ function ChangePassword(props: MyComponentProps) {
                 setInvalidPassword(true);
                 setMessage(response.data.message);
             }
-        }).catch((error: any) => {
+        }).catch(() => {
             notifyError();
         }
         );
@@ -165,7 +165,9 @@ function ChangePassword(props: MyComponentProps) {
                                                         placeholder="Enter Current Password"
                                                         name="password"
                                                         ref={passwordRef}
-                                                        onChange={() => { setRequiredPassword(false), setInvalidPassword(false) }}
+                                                        onChange={() => { // noinspection JSRemoveUnnecessaryParentheses
+                                                            setRequiredPassword(false)
+                                                            setInvalidPassword(false)}}
                                                         className={`mt-3 w-full rounded-lg bg-input py-3 px-5 font-medium outline-none transition ${requiredPassword || invalidPassword ? 'border-meta-1 border-2 dark:border-meta-1' : 'border-2 border-input'} dark:border-form-strokedark dark:bg-form-input dark:disabled:bg-black dark:text-white`}
                                                     />
                                                     <span className="absolute right-2 top-7.5 cursor-pointer"

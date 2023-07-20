@@ -1,9 +1,8 @@
 import { Fragment, useState, useRef } from "react";
 import APIService from "../../service/APIService.ts";
-import { FaUpload } from "react-icons/fa6";
 import { Dialog, Transition } from '@headlessui/react'
 import { useSearchParams } from "react-router-dom";
-import { StatusCodes } from "../../enum/index.ts";
+import { StatusCodes } from "../../enum";
 import { toast } from 'react-toastify';
 import { FaCircleCheck, FaCircleExclamation } from "react-icons/fa6";
 interface MyComponentProps {
@@ -11,12 +10,8 @@ interface MyComponentProps {
     onCloseCreateCategory: any;
     createCategory: () => void;
 }
-function getCategoryValue(getFirstCategory: unknown, getSecondCategory: unknown, getLastCategory: unknown) {
+function getCategoryValue(getFirstCategory: unknown) {
     switch (true) {
-        case !!getLastCategory:
-            return getLastCategory;
-        case !!getSecondCategory:
-            return getSecondCategory;
         case !!getFirstCategory:
             return getFirstCategory;
         default:
@@ -27,14 +22,10 @@ export default function CreateCategory(props: MyComponentProps) {
     const { show, onCloseCreateCategory } = props;
     const [searchParams] = useSearchParams();
     const getFirstCategory = searchParams.get('c1');
-    const getSecondCategory = searchParams.get('c2');
-    const getLastCategory = searchParams.get('c3');
     const nameRef = useRef<any>(null);
     const slugRef = useRef<any>(null);
     const orderingRef = useRef<any>(null);
-    const imageRef = useRef<any>(null);
-    const getParamsCategory = getCategoryValue(getFirstCategory, getSecondCategory, getLastCategory);
-
+    const getParamsCategory = getCategoryValue(getFirstCategory);
     const [onLoading, setOnLoading] = useState<boolean>(false);
     const [messageSlugExist, setMessageSlugExist] = useState<string>('');
     const [messageSlugAvailable, setMessageSlugAvailable] = useState<string>('');
@@ -69,32 +60,14 @@ export default function CreateCategory(props: MyComponentProps) {
             theme: "light",
         });
     };
-    const notifyErrorImage = () => {
-        toast.error('Allowed only png file', {
-            position: "bottom-left",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-        });
-    };
-
-    const [selectFile, setSelectedFile] = useState<File | null>(null);
-    const [previewURL, setPreviewURL] = useState<string | null>(null);
+    
     const [requiredName, setRequiredName] = useState<boolean>(false);
-    const [requiredImage, setRequiredImage] = useState<boolean>(false);
     const [enabled, setEnabled] = useState<boolean>(true);
 
     const onClose = () => {
         onCloseCreateCategory();
-        setSelectedFile(null);
-        setPreviewURL(null);
         setRequiredName(false);
         setEnabled(true);
-        setRequiredImage(false);
         setDisableButton(false);
         setOnLoading(false);
         setMessageSlugExist('');
@@ -106,45 +79,33 @@ export default function CreateCategory(props: MyComponentProps) {
     const handleSubmit = async () => {
         // getSlug
         const nameValue = nameRef.current?.value
-        const imageValue = imageRef.current?.value
-        if (!nameValue || !imageValue && !getFirstCategory && !getSecondCategory && !getLastCategory) {
+        if (!nameValue) {
             if (!nameValue) setRequiredName(true);
-            if (!imageValue && !getFirstCategory && !getSecondCategory && !getLastCategory) setRequiredImage(true);
             return;
-        };
-        if (selectFile) {
-            const formData = new FormData();
+        }
+        if (!getFirstCategory) {
             const data = {
                 name: nameRef.current?.value,
                 slug: slugRef.current?.value,
-                parentCategoryId: null,
+                parentCategoryId: "null",
                 ordering: orderingRef.current?.value,
                 status: enabled ? 1 : 0,
             }
-
-            formData.append('catphoto', selectFile);
-            formData.append('name', data.name);
-            formData.append('slug', data.slug);
-            formData.append('parentCategoryId', data.parentCategoryId as any);
-            formData.append('ordering', data.ordering);
-            formData.append('status', data.status as any);
-
-            APIService.insertFormData('category', formData).then((response: any) => {
-                if (response.status === StatusCodes.OK) {
-                    notify();
-                    onCloseCreateCategory();
-                    props.createCategory();
-                    setSelectedFile(null);
-                    setPreviewURL(null);
-                    setRequiredName(false);
-                    setEnabled(true);
-                    setShowMessageExist(false);
-                    setShowMessageAvailable(false);
+            APIService.post('category',data).then((response: any) => {
+                    if (response.status === StatusCodes.OK) {
+                        notify();
+                        onCloseCreateCategory();
+                        props.createCategory();
+                        setRequiredName(false);
+                        setEnabled(true);
+                        setShowMessageExist(false);
+                        setShowMessageAvailable(false);
+                    }
                 }
-            }
             ).catch(() => {
                 notifyError();
             });
+            
         } else {
             const data = {
                 name: nameRef.current?.value,
@@ -154,41 +115,24 @@ export default function CreateCategory(props: MyComponentProps) {
                 status: enabled ? 1 : 0,
             }
             APIService.post('category', data).then((response: any) => {
-                if (response.status === StatusCodes.OK) {
-                    notify();
-                    onCloseCreateCategory();
-                    props.createCategory();
-                    setSelectedFile(null);
-                    setPreviewURL(null);
-                    setRequiredName(false);
-                    setEnabled(true);
-                    setShowMessageExist(false);
-                    setShowMessageAvailable(false);
+                    if (response.status === StatusCodes.OK) {
+                        notify();
+                        onCloseCreateCategory();
+                        props.createCategory();
+                        setRequiredName(false);
+                        setEnabled(true);
+                        setShowMessageExist(false);
+                        setShowMessageAvailable(false);
+                    }
                 }
-            }
             ).catch(() => {
-                notifyError();
-            }
+                    notifyError();
+                }
             );
         }
 
     }
-
-    const handleFileChange = (event: any) => {
-        setRequiredImage(false);
-        const file = event.target.files && event.target.files[0];
-        if (file) {
-            const fileName = file.name;
-            const lastDot = fileName.lastIndexOf('.');
-            const ext = fileName.substring(lastDot + 1);
-            if (ext === 'png') {
-                setSelectedFile(file);
-                setPreviewURL(URL.createObjectURL(file));
-            } else {
-                notifyErrorImage();
-            }
-        }
-    };
+    
     const handleNameChange = (event: any) => {
         setShowMessageExist(false);
         setShowMessageAvailable(false);
@@ -285,7 +229,7 @@ export default function CreateCategory(props: MyComponentProps) {
                                             }
                                         </div>
                                         {
-                                            !getFirstCategory && !getSecondCategory && !getLastCategory &&
+                                            !getFirstCategory &&
                                             <div className="relative">
                                                 <label className="font-medium text-black dark:text-white">
                                                     Slug
@@ -371,54 +315,13 @@ export default function CreateCategory(props: MyComponentProps) {
                                                 </div>
                                             </div>
                                         </div>
-                                        {
-                                            !getFirstCategory && !getSecondCategory && !getLastCategory &&
-                                            <div className="relative">
-                                                <label className="font-medium text-black dark:text-white">Image <span className="text-meta-1">*</span></label>
-                                                <div className={`relative mt-3 mb-2 block w-full duration-150 transition-all cursor-pointer appearance-none rounded border-2 border-dashed bg-input py-4 px-4 dark:bg-meta-4 sm:py-7.5 ${requiredImage ? 'border-meta-1' : 'border-bodydark hover:border-primary'} ${previewURL ? 'border-primary' : ''}`} >
-                                                    <input
-                                                        type="file"
-                                                        accept="image/png"
-                                                        ref={imageRef}
-                                                        className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
-                                                        onChange={handleFileChange}
-                                                    />
-                                                    <div className="flex flex-col items-center justify-center space-y-3">
-                                                        {
-                                                            previewURL ? (
-                                                                <img
-                                                                    src={previewURL}
-                                                                    alt="Uploaded Image Preview"
-                                                                    className="h-30 w-30 object-contain rounded-lg"
-                                                                />
-                                                            ) : (
-                                                                <span className="flex h-15 w-15 items-center justify-center rounded-full border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
-                                                                    <FaUpload />
-                                                                </span>
-                                                            )
-                                                        }
-                                                        {
-                                                            !previewURL &&
-                                                            <p className="py-3">
-                                                                <span className="text-primary">Click to upload </span> or drag and drop image *.png here
-                                                            </p>
-                                                        }
-                                                    </div>
-                                                </div>
-                                                {
-                                                    requiredImage &&
-                                                    <span className="text-meta-1 text-sm absolute">
-                                                        Image is required
-                                                    </span>
-                                                }
-                                            </div>
-                                        }
+                                        
                                         <div className="flex justify-end items-center">
                                             <button className="flex justify-center bg-transparent border border-meta-9 px-8 py-2 rounded-md font-medium text-black dark:text-white mr-3.5" onClick={onClose}>
                                                 Cancel
                                             </button>
                                             {
-                                                disableButton && !getFirstCategory && !getSecondCategory && !getLastCategory ?
+                                                disableButton && !getFirstCategory ?
                                                     <button className="flex justify-center bg-primary/60 px-8 py-2 rounded-md font-medium text-gray" disabled>
                                                         Create
                                                     </button>

@@ -3,14 +3,13 @@ import APIService from "../../service/APIService.ts";
 import { Link, useNavigate } from "react-router-dom";
 import { StatusCodes } from '../../enum';
 import { toast } from 'react-toastify';
-import { FaCaretDown, FaCheck } from "react-icons/fa6";
+import { FaCaretDown } from "react-icons/fa6";
 import 'react-quill/dist/quill.snow.css';
 import MyEditor from "./MyEditor.tsx";
 import Loader from "../../common/Loader/index.tsx";
 
 const CreateContent = () => {
-    // const editorRef = useRef(null);
-    const titleRef = useRef<any>(null);
+    const nameRef = useRef<any>(null);
     const [requiredTitle, setRequiredTitle] = useState<boolean>(false);
     const [requiredCategory, setRequiredCategory] = useState<boolean>(false);
     const [requiredBody, setRequiredBody] = useState<boolean>(false);
@@ -19,12 +18,9 @@ const CreateContent = () => {
     const [openId, setOpenId] = useState<number>(0);
     const [getId, setGetId] = useState<number>(0);
     const navigate = useNavigate();
-
     const [category, setCategory] = useState([]);
     const [loading, setLoading] = useState<boolean>(true);
-
     const [editorHtml, setEditorHtml] = useState<string>("");
-
     const handleChange = (html: string) => {
         setRequiredBody(false);
         setEditorHtml(html);
@@ -57,7 +53,7 @@ const CreateContent = () => {
 
 
     useEffect(() => {
-        APIService.get(`subcat`).then((response: any) => {
+        APIService.get(`category/front/sub`).then((response: any) => {
             if (response.status === StatusCodes.OK) {
                 setCategory(response.data.data);
                 setLoading(false);
@@ -68,19 +64,19 @@ const CreateContent = () => {
     const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
 
     const handleSubmit = async () => {
-        const title = titleRef.current?.value;
+        const name = nameRef.current?.value;
         const category = getId !== 0 && getId;
-        const body = editorHtml;
-        if (!title || !category) {
-            if (!title) setRequiredTitle(true);
+        const description = editorHtml;
+        if (!name || !category) {
+            if (!name) setRequiredTitle(true);
             if (!category) setRequiredCategory(true);
             return;
         }
         const data = {
-            title: titleRef.current?.value,
+            name: nameRef.current?.value,
             categoryId: getId as number,
-            body: body,
-            allowPublic: enabled ? 1 : 0,
+            description: description,
+            status: enabled,
             userId: userId
 
         };
@@ -139,7 +135,7 @@ const CreateContent = () => {
                                             type="text"
                                             placeholder="Title"
                                             name="title"
-                                            ref={titleRef}
+                                            ref={nameRef}
                                             onChange={() => setRequiredTitle(false)}
                                             className={`w-full rounded-md border bg-input py-3 px-5 font-medium outline-none transition disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input ${requiredTitle ? 'border-meta-1 focus:border-meta-1 dark:border-meta-1' : 'border-input'}`}
                                         />
@@ -187,13 +183,13 @@ const CreateContent = () => {
                                                     return item.status === true && (
                                                         <React.Fragment key={index}>
                                                             <div
-                                                                className={`relative pl-4 py-2 p-1 my-0.5 rounded-md bg-[#f4f5f6] dark:bg-gray-box ${item.subcategories.length > 0 ? 'cursor-pointer' : 'cursor-default'}`}
+                                                                className={`relative pl-4 py-2 p-1 my-0.5 rounded-md bg-[#f4f5f6] dark:bg-gray-box ${item.subCategories.length > 0 ? 'cursor-pointer' : 'cursor-default'}`}
                                                                 onClick={() => handleCategory(item.id)}>
                                                                 <span className="text-orange-dark font-semibold">
                                                                     {item.name}
                                                                 </span>
                                                                 {
-                                                                    item.subcategories.length > 0 &&
+                                                                    item.subCategories.length > 0 &&
                                                                     <span
                                                                         className={`absolute top-1/2 right-4 z-30 -translate-y-1/2 ${openId === item.id && showSubCategory ? 'transform rotate-180 transition duration-500' : 'transform rotate-0 transition duration-500'}`}
                                                                     >
@@ -202,10 +198,10 @@ const CreateContent = () => {
                                                                 }
                                                             </div>
                                                             {
-                                                                openId === item.id && showSubCategory && item.subcategories.length > 0 &&
+                                                                openId === item.id && showSubCategory && item.subCategories.length > 0 &&
                                                                 <div className="flex flex-col gap-1.5 pl-4">
                                                                     {
-                                                                        item.subcategories.map((sub: any, index: number) => {
+                                                                        item.subCategories.map((sub: any, index: number) => {
                                                                             return sub.status === true && (
                                                                                 <React.Fragment key={index}>
                                                                                     <div className="relative pl-6 p-0.5 my-0.5 rounded-md">
@@ -237,79 +233,6 @@ const CreateContent = () => {
                                                                                             </span>
                                                                                         </label>
                                                                                     </div>
-                                                                                    {
-                                                                                        sub.subcategories.map((sub2: any, index: number) => {
-                                                                                            return sub2.status === true && (
-                                                                                                <React.Fragment key={index}>
-                                                                                                    <div className="relative pl-8 p-0.5 my-0.5 rounded-md">
-                                                                                                        <label
-                                                                                                            htmlFor={`checkbox-${sub2.id}`}
-                                                                                                            className="flex cursor-pointer select-none items-center"
-                                                                                                        >
-                                                                                                            <div className="relative">
-                                                                                                                <input
-                                                                                                                    type="checkbox"
-                                                                                                                    id={`checkbox-${sub2.id}`}
-                                                                                                                    className="sr-only"
-                                                                                                                    onChange={() => {
-                                                                                                                        setGetId(sub2.id)
-                                                                                                                        setRequiredCategory(false)
-                                                                                                                    }}
-                                                                                                                />
-                                                                                                                <div className={`mr-4 flex h-5 w-5 items-center justify-center rounded-full border ${getId === sub2.id && 'border-primary'
-                                                                                                                    }`}
-                                                                                                                >
-                                                                                                                    <span className={`h-2.5 w-2.5 rounded-full bg-transparent ${getId === sub2.id && '!bg-primary'
-                                                                                                                        }`}
-                                                                                                                    >
-                                                                                                                        {' '}
-                                                                                                                    </span>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                            <span className="text-warning font-medium">
-                                                                                                                {sub2.name}
-                                                                                                            </span>
-                                                                                                        </label>
-                                                                                                    </div>
-                                                                                                    {
-                                                                                                        sub2.subcategories.map((sub3: any, index: number) => {
-                                                                                                            return sub3.status === true && (
-                                                                                                                <div className="relative pl-10 p-0.5 my-0.5 rounded-md" key={index}>
-                                                                                                                    <label
-                                                                                                                        htmlFor={`checkbox-${sub3.id}`}
-                                                                                                                        className="flex cursor-pointer select-none items-center"
-                                                                                                                    >
-                                                                                                                        <div className="relative">
-                                                                                                                            <input
-                                                                                                                                type="checkbox"
-                                                                                                                                id={`checkbox-${sub3.id}`}
-                                                                                                                                className="sr-only"
-                                                                                                                                onChange={() => {
-                                                                                                                                    setGetId(sub3.id)
-                                                                                                                                    setRequiredCategory(false)
-                                                                                                                                }}
-                                                                                                                            />
-                                                                                                                            <div className={`mr-4 flex h-5 w-5 items-center justify-center rounded border ${getId === sub3.id && 'border-primary bg-gray dark:bg-transparent'
-                                                                                                                                }`} >
-                                                                                                                                <span className={`opacity-0 ${getId === sub3.id && '!opacity-100'}`}>
-                                                                                                                                    <FaCheck className="fill-primary" />
-                                                                                                                                </span>
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                        <span className="font-medium text-gray-box-2 dark:text-white">
-                                                                                                                            {sub3.name}
-                                                                                                                        </span>
-                                                                                                                    </label>
-                                                                                                                </div>
-                                                                                                            )
-                                                                                                        }
-                                                                                                        )
-                                                                                                    }
-                                                                                                </React.Fragment>
-                                                                                            )
-                                                                                        }
-                                                                                        )
-                                                                                    }
                                                                                 </React.Fragment>
                                                                             )
                                                                         })
@@ -373,7 +296,6 @@ const CreateContent = () => {
                 </div >
             </>
     );
-}
-    ;
+};
 
 export default CreateContent;
