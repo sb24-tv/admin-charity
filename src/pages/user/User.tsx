@@ -12,7 +12,6 @@ const User = () => {
     let [isOpenCreateUser, setIsOpenCreateUser] = useState<boolean>(false);
     let [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
     let [isOpenChangePassword, setIsOpenChangePassword] = useState<boolean>(false);
-
     const [userEdit, setUserEdit] = useState<any>([]);
     const [dataForEdit, setDataForEdit] = useState<any>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -46,7 +45,6 @@ const User = () => {
             <Loader />
         )
         :
-        
         <>
             <CreateUser show={isOpenCreateUser} onCloseCreateUser={() => setIsOpenCreateUser(false)} createdUser={() => { fetchData(); }} />
             <EditUser show={isOpenEdit} onCloseEditUser={onCloseEditUser} dataForEditUser={dataForEdit} updatedUser={() => { fetchData(); }} />

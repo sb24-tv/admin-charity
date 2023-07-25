@@ -18,8 +18,8 @@ function Pagination({ pagination, pages, searchKey, categoryId }: PaginationProp
     };
     const totalPage = Math.ceil(pages.total / pages.limit);
     const currentPage = pages.current_page;
-
     const filterKey = searchKey ? `?search=${searchKey}&` : categoryId ? `?categoryId=${categoryId}&` : '';
+    // noinspection JSVoidFunctionReturnValueUsed
     return (
         totalPage >= 2 &&
         <ul className="flex items-center justify-start h-full gap-x-4 mt-6 flex-wrap">
@@ -38,7 +38,7 @@ function Pagination({ pagination, pages, searchKey, categoryId }: PaginationProp
                 totalPage < 7
                     ?
                     <>
-                        {Array.apply(0, Array(totalPage)).map((arr, i) => (
+                        {Array.apply(0, Array(totalPage)).map((arr: unknown, i) => (
                             <React.Fragment key={i}>
                                 <li key={i}>
                                     <Link

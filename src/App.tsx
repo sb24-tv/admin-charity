@@ -2,10 +2,9 @@ import {Suspense, lazy} from 'react';
 import {Route, Routes} from 'react-router-dom';
 import Dashboard from './pages/Dashboard.tsx';
 import SignIn from './pages/Authentication/SignIn';
-
 import useMiddleware from "./hooks/useMidleware.ts";
-
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
+const Slide = lazy(() => import('./pages/slideshow/Slide.tsx'));
 const Category = lazy(() => import('./pages/category/Category'));
 const Content = lazy(() => import('./pages/content/Content'));
 const CreateContent = lazy(() => import('./pages/content/CreateContent'));
@@ -62,6 +61,14 @@ function App() {
                         }
                     />
                     <Route
+                        path="/slide"
+                        element={
+                            <Suspense fallback={<Loader/>}>
+                                <Slide/>
+                            </Suspense>
+                        }
+                    />
+                    <Route
                         path="*"
                         element={
                             <Suspense fallback={<Loader/>}>
@@ -70,8 +77,7 @@ function App() {
                         }
                     />
                 </Route>
-
-
+                
             </Routes>
         </Suspense>
     ) : <SignIn/>;

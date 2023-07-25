@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaKey } from "react-icons/fa6";
 import ChangePassword from '../pages/user/ChangePassword';
-import APIService from '../service/APIService';
-import { StatusCodes } from '../enum';
-
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -38,7 +35,9 @@ const DropdownUser = () => {
 
   // close if the esc key is pressed
   useEffect(() => {
+    // noinspection JSDeprecatedSymbols
     const keyHandler = ({ keyCode }: KeyboardEvent) => {
+      // noinspection JSDeprecatedSymbols
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
@@ -98,7 +97,7 @@ const DropdownUser = () => {
           ref={dropdown}
           onFocus={() => setDropdownOpen(true)}
           onBlur={() => setDropdownOpen(false)}
-          className={`absolute right-0 mt-5 max-lg:mt-10 flex w-62.5 flex-col rounded-xl bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen === true ? 'block' : 'hidden'
+          className={`absolute right-0 mt-5 max-lg:mt-10 flex w-62.5 flex-col rounded-xl bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen ? 'block' : 'hidden'
             }`}
         >
           <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-6 dark:border-strokedark">

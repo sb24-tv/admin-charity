@@ -50,8 +50,7 @@ const CreateContent = () => {
             theme: "light",
         });
     };
-
-
+    
     useEffect(() => {
         APIService.get(`category/front/sub`).then((response: any) => {
             if (response.status === StatusCodes.OK) {

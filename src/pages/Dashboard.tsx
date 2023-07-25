@@ -1,15 +1,15 @@
-import {FaBarsStaggered, FaNewspaper, FaUserLarge} from "react-icons/fa6";
+import {FaBarsStaggered, FaNewspaper, FaUserLarge,FaImage} from "react-icons/fa6";
 import {useEffect, useState} from "react";
 import APIService from "../service/APIService.ts";
 import {Link} from "react-router-dom";
 import Loader from "../common/Loader/index.tsx";
-import { StatusCodes } from "../enum/index.ts";
-
+import { StatusCodes } from "../enum";
 
 const ECommerce = () => {
     const [countCategory, setCountCategory] = useState(0)
     const [countContent, setCountContent] = useState(0)
     const [countUser, setCountUser] = useState(0)
+    const [countSlide, setCountSlide] = useState(0)
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -33,6 +33,12 @@ const ECommerce = () => {
                 setLoading(false);
             }
         })
+        APIService.get(`slide`).then((response: any) => {
+            if (response.status == StatusCodes.OK) {
+                setCountSlide(response.data.length);
+                setLoading(false);
+            }
+        })
 
     }, []);
     return (
@@ -48,7 +54,7 @@ const ECommerce = () => {
                     className="rounded-xl bg-white py-6 px-7.5  box-shadow-custom-2 dark:border-strokedark dark:bg-black-custom">
                     <div
                         className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                        <FaBarsStaggered className="fill-orange-dark dark:fill-white"/>
+                        <FaBarsStaggered className="fill-pink dark:fill-white"/>
                     </div>
 
                     <div className="mt-4 flex items-end justify-between">
@@ -64,7 +70,7 @@ const ECommerce = () => {
                     className="rounded-xl bg-white py-6 px-7.5 box-shadow-custom-2 dark:border-strokedark dark:bg-black-custom">
                     <div
                         className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                        <FaNewspaper className="fill-orange-dark dark:fill-white"/>
+                        <FaNewspaper className="fill-pink dark:fill-white"/>
                     </div>
 
                     <div className="mt-4 flex items-end justify-between">
@@ -76,11 +82,27 @@ const ECommerce = () => {
                         </div>
                     </div>
                 </Link>
+                <Link to="/slide"
+                      className="rounded-xl bg-white py-6 px-7.5 box-shadow-custom-2 dark:border-strokedark dark:bg-black-custom">
+                    <div
+                        className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
+                        <FaImage className="fill-pink dark:fill-white"/>
+                    </div>
+                    
+                    <div className="mt-4 flex items-end justify-between">
+                        <div>
+                            <h4 className="text-title-md font-bold text-black dark:text-white">
+                                {countSlide ? countSlide : 0}
+                            </h4>
+                            <span className="text-sm font-medium">Total SlideShow</span>
+                        </div>
+                    </div>
+                </Link>
                 <Link to="/user"
                     className="rounded-xl bg-white py-6 px-7.5 box-shadow-custom-2 dark:border-strokedark dark:bg-black-custom">
                     <div
                         className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                        <FaUserLarge className="fill-orange-dark dark:fill-white"/>
+                        <FaUserLarge className="fill-pink dark:fill-white"/>
                     </div>
 
                     <div className="mt-4 flex items-end justify-between">
@@ -92,7 +114,6 @@ const ECommerce = () => {
                         </div>
                     </div>
                 </Link>
-
             </div>
         </>
     );

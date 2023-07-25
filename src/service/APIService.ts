@@ -58,6 +58,7 @@ class APIService {
 		try {
 			const response = await fetch(url, options);
 			if (response.status === StatusCodes.INTERNAL_SERVER_ERROR) {
+				// noinspection ExceptionCaughtLocallyJS
 				throw new Error(`Request failed with status ${response.status}`);
 			}
 			return {
@@ -101,6 +102,7 @@ class APIService {
 		try {
 			const response = await fetch(url, options);
 			if (response.status === StatusCodes.INTERNAL_SERVER_ERROR) {
+				// noinspection ExceptionCaughtLocallyJS
 				throw new Error(`Request failed with status ${response.status}`);
 			}
 			return {
@@ -123,6 +125,7 @@ class APIService {
 		try {
 			const response = await fetch(url, options);
 			if (response.status === StatusCodes.INTERNAL_SERVER_ERROR) {
+				// noinspection ExceptionCaughtLocallyJS
 				throw new Error(`Request failed with status ${response.status}`);
 			}
 			return {

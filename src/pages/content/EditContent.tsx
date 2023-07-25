@@ -18,22 +18,17 @@ const EditContent = () => {
 	const [contentSelected, setContentSelected] = useState<any>([]);
 	const [categorySelected, setCategorySelected] = useState<any>([]);
 	const [loading, setLoading] = useState<boolean>(true);
-	
 	const navigate = useNavigate();
 	let { id } = useParams();
-	
 	const [category, setCategory] = useState<any>([]);
 	const [editorHtml, setEditorHtml] = useState<string>("");
-	
 	const quillRef = useRef<any>(null);
-	
 	const handleChange = (value: string) => {
 		if (id) {
 			setRequiredBody(false);
 			setEditorHtml(value);
 		}
 	};
-	
 	const notify = () => {
 		toast.success('Content updated successfully', {
 			position: "bottom-left",
@@ -60,7 +55,7 @@ const EditContent = () => {
 	};
 	
 	useEffect(() => {
-		APIService.get(`subcat`).then((response: any) => {
+		APIService.get(`category/front/sub`).then((response: any) => {
 			if (response.status === StatusCodes.OK) {
 				setCategory(response.data.data);
 			}
@@ -77,7 +72,6 @@ const EditContent = () => {
 	// noinspection JSDeprecatedSymbols
 	const getParentId = contentById.category ? searchDataById(contentById?.category?.id, category) : null;
 	const categoryId = getParentId ? category[getParentId.position[0]].id : null;
-	
 	const userId = JSON.parse(localStorage.getItem('user') || '{}').id;
 	
 	const handleSubmit = async () => {
@@ -129,8 +123,6 @@ const EditContent = () => {
 		// noinspection JSDeprecatedSymbols
 		setCategorySelected(contentById?.category?.id);
 	}, [contentById]);
-
-	
 	
 	return (
 		loading ?
@@ -138,7 +130,6 @@ const EditContent = () => {
 			<Loader />
 		)
 		:
-
 		<>
 			<div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<h2 className="text-title-md2 font-semibold text-black dark:text-white">
@@ -160,7 +151,7 @@ const EditContent = () => {
 										placeholder="Title"
 										name="title"
 										ref={nameRef}
-										defaultValue={contentById?.title}
+										defaultValue={contentById?.name}
 										onChange={() => setRequiredTitle(false)}
 										className={`w-full rounded-md border bg-input py-3 px-5 font-medium outline-none transition disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input ${requiredTitle ? 'border-meta-1 focus:border-meta-1' : 'border-input'}`}
 									/>
@@ -177,7 +168,7 @@ const EditContent = () => {
 											ref={quillRef}
 											theme="snow"
 											onChange={handleChange}
-											value={editorHtml || contentById?.body}
+											value={editorHtml || contentById?.description}
 											className="bg-input dark:bg-form-input custom-quill min-h-[40vh]"
 											placeholder={"Write something awesome..."}
 									/>
@@ -230,7 +221,7 @@ const EditContent = () => {
 															openId === item.id && item.subCategories.length > 0 &&
                                                             <div className="flex flex-col gap-1.5 pl-4">
 																{
-																	item.subcategories.map((sub: any, index: number) => {
+																	item.subCategories.map((sub: any, index: number) => {
 																		return sub.status === true && (
 																			<React.Fragment key={index}>
 																				<div className="relative pl-6 p-0.5 my-0.5 rounded-md">
@@ -329,6 +320,5 @@ const EditContent = () => {
 		</>
 	);
 }
-
 
 export default EditContent;
