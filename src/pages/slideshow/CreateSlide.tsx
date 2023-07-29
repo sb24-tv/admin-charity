@@ -1,4 +1,4 @@
-import { Fragment, useState, useRef } from "react";
+import {Fragment, useState, useRef} from "react";
 import APIService from "../../service/APIService.ts";
 import { FaUpload } from "react-icons/fa6";
 import { Dialog, Transition } from '@headlessui/react'
@@ -8,10 +8,12 @@ import { toast } from 'react-toastify';
 interface MyComponentProps {
 	show: boolean;
 	onCloseCreateSlide: any;
-	createSlide: () => void;
+	createdSlide: () => void;
 }
 export default function createSlide(props: MyComponentProps) {
 	const { show, onCloseCreateSlide } = props;
+	const titleRef = useRef<any>(null);
+	const descriptionRef = useRef<any>(null);
 	const orderingRef = useRef<any>(null);
 	const imageRef = useRef<any>(null);
 	const [disableButton, setDisableButton] = useState<boolean>(false);
@@ -52,10 +54,20 @@ export default function createSlide(props: MyComponentProps) {
 			theme: "light",
 		});
 	};
+	// useEffect(() => {
+	// 	APIService.get(`slide`).then((response: any) => {
+	// 		if (response.status === StatusCodes.OK) {
+	// 			setSlide(response.data);
+	// 			setLoading(false);
+	// 		}
+	// 	});
+	// }, []);
 	
 	const [selectFile, setSelectedFile] = useState<File | null>(null);
 	const [previewURL, setPreviewURL] = useState<string | null>(null);
 	const [requiredImage, setRequiredImage] = useState<boolean>(false);
+	const [requiredTitle, setRequiredTitle] = useState<boolean>(false);
+	const [requiredDescription, setRequiredDescription] = useState<boolean>(false);
 	const [enabled, setEnabled] = useState<boolean>(true);
 	
 	const onClose = () => {
@@ -64,6 +76,8 @@ export default function createSlide(props: MyComponentProps) {
 		setPreviewURL(null);
 		setEnabled(true);
 		setRequiredImage(false);
+		setRequiredTitle(false);
+		setRequiredDescription(false)
 		setDisableButton(false);
 	}
 	
@@ -73,12 +87,15 @@ export default function createSlide(props: MyComponentProps) {
 			if (!imageValue) setRequiredImage(true);
 			return;
 		}
-		
 			const formData = new FormData();
 			const data = {
+				title: titleRef.current.value,
+				description: descriptionRef.current.value,
 				ordering: orderingRef.current?.value,
-				status: enabled ? 1 : 0,
+				status: enabled ? 1 : 0
 			}
+			formData.append('title', data.title);
+			formData.append('description', data.description);
 			formData.append('image', selectFile as any);
 			formData.append('ordering', data.ordering);
 			formData.append('status', data.status as any);
@@ -86,7 +103,7 @@ export default function createSlide(props: MyComponentProps) {
 					if (response.status === StatusCodes.CREATED) {
 						notify();
 						onCloseCreateSlide();
-						props.createSlide();
+						props.createdSlide();
 						setSelectedFile(null);
 						setPreviewURL(null);
 						setEnabled(true);
@@ -146,6 +163,42 @@ export default function createSlide(props: MyComponentProps) {
 								</Dialog.Title>
 								<div className="rounded-sm dark:border-strokedark dark:bg-boxdark">
 									<div className="flex flex-col gap-5.5 p-6.5">
+										<div className="relative">
+											<label className="font-medium text-black dark:text-white">
+												Title <span className="text-meta-1">*</span>
+											</label>
+											<input
+												type="text"
+												placeholder="Name"
+												ref={titleRef}
+												className={`mt-3 w-full rounded-lg bg-input py-3 px-5 font-medium outline-none transition ${requiredTitle ? 'border-meta-1 border-2 dark:border-meta-1' : 'border-2 border-input'} dark:border-form-strokedark dark:bg-form-input dark:disabled:bg-black dark:text-white`}
+											/>
+											{
+												requiredTitle && (
+													<span className="text-meta-1 text-sm absolute left-0 bottom-[-1.5rem]">
+                                                        Title is required
+                                                    </span>
+												)
+											}
+										</div>
+										<div className="relative">
+											<label className="font-medium text-black dark:text-white">
+												Description <span className="text-meta-1">*</span>
+											</label>
+											<input
+												type="text"
+												placeholder="Name"
+												ref={descriptionRef}
+												className={`mt-3 w-full rounded-lg bg-input py-3 px-5 font-medium outline-none transition ${requiredDescription ? 'border-meta-1 border-2 dark:border-meta-1' : 'border-2 border-input'} dark:border-form-strokedark dark:bg-form-input dark:disabled:bg-black dark:text-white`}
+											/>
+											{
+												requiredDescription && (
+													<span className="text-meta-1 text-sm absolute left-0 bottom-[-1.5rem]">
+                                                        Description is required
+                                                    </span>
+												)
+											}
+										</div>
 										<div>
 											<div className="flex justify-between">
 												<label className="font-medium text-black dark:text-white">

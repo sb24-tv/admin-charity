@@ -6,6 +6,7 @@ import CreateSlide from "./CreateSlide.tsx";
 import EditSlide from "./EditSlide.tsx";
 import NoFile from "../../images/logo/no-task.png";
 import Loader from "../../common/Loader/index.tsx";
+import {StatusCodes} from "../../enum";
 // import {data} from "autoprefixer";
 
 function getURL() {
@@ -26,8 +27,11 @@ const Slide = () => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const fetchData = () => {
 		APIService.get('slide').then((response: any) => {
-			setSlide(response.data);
-			setLoading(false);
+			if(response.status === StatusCodes.OK){
+				setSlide(response.data);
+				setLoading(false);
+			}
+			
 		});
 	}
 	useEffect(() => {
@@ -54,8 +58,8 @@ const Slide = () => {
 			)
 			:
 			<>
-				<CreateSlide show={open} onCloseCreateSlide={onCloseCreateSlide} createSlide={() => fetchData()} />
-				<EditSlide show={openEdit} onCloseEditSlide={onCloseEditSlide} dataForEditSlide={dataForEdit} updateSlide={() => fetchData()} />
+				<CreateSlide show={open} onCloseCreateSlide={onCloseCreateSlide} createdSlide={() => fetchData()} />
+				<EditSlide show={openEdit} onCloseEditSlide={onCloseEditSlide} dataForEditSlide={dataForEdit} updatedSlide={() => fetchData()} />
 				<div className="mb-6 flex flex-col gap-3 sm:flex-row items-center">
 					<h2 className="text-title-md2 font-semibold text-black dark:text-white">
 						Slide
@@ -79,7 +83,10 @@ const Slide = () => {
 									No
 								</th>
 								<th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
-									Name
+									Title
+								</th>
+								<th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
+									Description
 								</th>
 								<th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
 									Order
@@ -116,9 +123,14 @@ const Slide = () => {
 																alt={slide.name} className="w-20" onError={onError} />
 														</div>
 														<p className="text-base text-black dark:text-white">
-															{slide.name}
+															{slide.title}
 														</p>
 													</div>
+											</td>
+											<td className="py-5 px-4 dark:border-strokedark">
+												<p className="text-base text-black dark:text-white">
+													{slide.description}
+												</p>
 											</td>
 											<td className="py-5 px-4 dark:border-strokedark">
 													<p className="text-base text-black dark:text-white">

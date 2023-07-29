@@ -8,7 +8,7 @@ interface MyComponentProps {
 	show: boolean;
 	onCloseEditSlide: any;
 	dataForEditSlide: any;
-	updateSlide: () => void;
+	updatedSlide: () => void;
 }
 function getURL() {
 	// @ts-ignore
@@ -24,6 +24,8 @@ export default function EditSlide(props: MyComponentProps) {
 	const { show, onCloseEditSlide, dataForEditSlide } = props;
 	const [slideSelected, setSlideSelected] = useState<any>({});
 	const nameRef = useRef<any>(null);
+	const titleRef = useRef<any>(null);
+	const descriptionRef = useRef<any>(null);
 	const orderingRef = useRef<any>(null);
 	const imageRef = useRef<any>(null);
 	const [disableButton, setDisableButton] = useState<boolean>(false);
@@ -71,10 +73,14 @@ export default function EditSlide(props: MyComponentProps) {
 	
 	const [selectFile, setSelectedFile] = useState<File | null>(null);
 	const [previewURL, setPreviewURL] = useState<string | null>(null);
+	const [requiredTitle, setRequiredTitle] = useState<boolean>(false);
+	const [requiredDescription, setRequiredDescription] = useState<boolean>(false);
 	
 	const onClose = () => {
 		onCloseEditSlide();
 		setSelectedFile(null);
+		setRequiredTitle(false)
+		setRequiredDescription(false)
 		setPreviewURL(null);
 		setDisableButton(false);
 	}
@@ -90,10 +96,13 @@ export default function EditSlide(props: MyComponentProps) {
 			const id = dataForEditSlide.id;
 			const data = {
 				name: nameRef.current?.value,
+				title: titleRef.current.value,
+				description: descriptionRef.current.value,
 				ordering: orderingRef.current?.value,
 				status: statusSlide ? 1 : 0,
 			}
-			
+			formData.append('title', data.title);
+			formData.append('description', data.description);
 			formData.append('image', selectFile || dataForEditSlide.name);
 			formData.append('ordering', data.ordering);
 			formData.append('status', data.status as any);
@@ -102,7 +111,7 @@ export default function EditSlide(props: MyComponentProps) {
 					if (response.status === StatusCodes.OK) {
 						notify();
 						onCloseEditSlide();
-						props.updateSlide();
+						props.updatedSlide();
 						setSelectedFile(null);
 						setPreviewURL(null);
 						setSlideSelected(dataForEditSlide);
@@ -114,6 +123,8 @@ export default function EditSlide(props: MyComponentProps) {
 			const statusSlide = slideSelected.status;
 			const data = {
 				name: nameRef.current?.value,
+				title: titleRef.current.value,
+				description: descriptionRef.current.value,
 				ordering: orderingRef.current?.value,
 				status: statusSlide ? 1 : 0,
 			}
@@ -121,7 +132,7 @@ export default function EditSlide(props: MyComponentProps) {
 					if (response.status === StatusCodes.OK) {
 						notify();
 						onCloseEditSlide();
-						props.updateSlide();
+						props.updatedSlide();
 						setSelectedFile(null);
 						setPreviewURL(null);
 						setSlideSelected(dataForEditSlide);
@@ -186,6 +197,44 @@ export default function EditSlide(props: MyComponentProps) {
 								</Dialog.Title>
 								<div className="rounded-sm dark:border-strokedark dark:bg-boxdark">
 									<div className="flex flex-col gap-5.5 p-6.5">
+										<div className="relative">
+											<label className="font-medium text-black dark:text-white">
+												Title <span className="text-meta-1">*</span>
+											</label>
+											<input
+												type="text"
+												placeholder="Name"
+												defaultValue={dataForEditSlide?.title}
+												ref={titleRef}
+												className={`mt-3 w-full rounded-lg bg-input py-3 px-5 font-medium outline-none transition ${requiredTitle ? 'border-meta-1 border-2 dark:border-meta-1' : 'border-2 border-input'} dark:border-form-strokedark dark:bg-form-input dark:disabled:bg-black dark:text-white`}
+											/>
+											{
+												requiredTitle && (
+													<span className="text-meta-1 text-sm absolute left-0 bottom-[-1.5rem]">
+                                                        Title is required
+                                                    </span>
+												)
+											}
+										</div>
+										<div className="relative">
+											<label className="font-medium text-black dark:text-white">
+												Description <span className="text-meta-1">*</span>
+											</label>
+											<input
+												type="text"
+												placeholder="Name"
+												defaultValue={dataForEditSlide?.description}
+												ref={descriptionRef}
+												className={`mt-3 w-full rounded-lg bg-input py-3 px-5 font-medium outline-none transition ${requiredDescription ? 'border-meta-1 border-2 dark:border-meta-1' : 'border-2 border-input'} dark:border-form-strokedark dark:bg-form-input dark:disabled:bg-black dark:text-white`}
+											/>
+											{
+												requiredDescription && (
+													<span className="text-meta-1 text-sm absolute left-0 bottom-[-1.5rem]">
+                                                        Description is required
+                                                    </span>
+												)
+											}
+										</div>
 										<div>
 											<div className="flex justify-between">
 												<label className="font-medium text-black dark:text-white">
