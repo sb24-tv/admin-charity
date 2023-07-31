@@ -3,12 +3,16 @@ import APIService from "../../service/APIService.ts";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { StatusCodes, searchDataById } from '../../enum';
 import { toast } from 'react-toastify';
-import { FaCaretDown } from "react-icons/fa6";
+import {FaCaretDown, FaUpload} from "react-icons/fa6";
 import 'react-quill/dist/quill.snow.css';
 import MyEditor from "./MyEditor"
 import Loader from "../../common/Loader/index.tsx";
 
 const EditContent = () => {
+	const [selectFile, setSelectedFile] = useState<File | null>(null);
+	const imageRef = useRef<any>(null);
+	const [previewURL, setPreviewURL] = useState<string | null>(null);
+	const [requiredImage, setRequiredImage] = useState<boolean>(false);
 	const nameRef = useRef<any>(null);
 	const [requiredTitle, setRequiredTitle] = useState<boolean>(false);
 	const [requiredCategory, setRequiredCategory] = useState<boolean>(false);
@@ -54,6 +58,19 @@ const EditContent = () => {
 		});
 	};
 	
+	const notifyErrorImage = () => {
+		toast.error('Allowed only png file', {
+			position: "bottom-left",
+			autoClose: 5000,
+			hideProgressBar: false,
+			closeOnClick: true,
+			pauseOnHover: true,
+			draggable: true,
+			progress: undefined,
+			theme: "light",
+		});
+	};
+	
 	useEffect(() => {
 		APIService.get(`category/front/sub`).then((response: any) => {
 			if (response.status === StatusCodes.OK) {
@@ -85,6 +102,7 @@ const EditContent = () => {
 			return;
 		}
 		const data = {
+			thumbnail: selectFile as any,
 			name: nameRef.current?.value,
 			categoryId: categorySelected as number,
 			description: description,
@@ -95,6 +113,9 @@ const EditContent = () => {
 				if (response.status === StatusCodes.OK) {
 					notify();
 					navigate('/content');
+					setPreviewURL(null);
+					setRequiredImage(false);
+					setSelectedFile(null)
 					setRequiredTitle(false);
 					setRequiredCategory(false);
 					setOpenId(0);
@@ -105,6 +126,22 @@ const EditContent = () => {
 			}
 		);
 	}
+	
+	const handleFileChange = (event: any) => {
+		setRequiredImage(false);
+		const file = event.target.files && event.target.files[0];
+		if (file) {
+			const fileName = file.name;
+			const lastDot = fileName.lastIndexOf('.');
+			const ext = fileName.substring(lastDot + 1);
+			if (ext === 'png') {
+				setSelectedFile(file);
+				setPreviewURL(URL.createObjectURL(file));
+			} else {
+				notifyErrorImage();
+			}
+		}
+	};
 	
 	const handleCategory = (id: number) => {
 		setOpenId(() => id === openId ? 0 : id);
@@ -269,6 +306,48 @@ const EditContent = () => {
 									requiredCategory && <span className="text-meta-1 text-sm absolute left-0 -bottom-7">Category is required</span>
 								}
 							</div>
+							
+							<div className="mb-7 relative">
+								<label className="font-medium text-black dark:text-white">Image <span className="text-meta-1">*</span></label>
+								<div className={`relative mt-3 mb-2 block w-full duration-150 transition-all cursor-pointer appearance-none rounded border-2 border-dashed bg-input py-4 px-4 dark:bg-meta-4 sm:py-7.5 ${requiredImage ? 'border-meta-1' : 'border-bodydark hover:border-primary'} ${previewURL ? 'border-primary' : ''}`} >
+									<input
+										type="file"
+										accept="image/png"
+										ref={imageRef}
+										className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
+										onChange={handleFileChange}
+									/>
+									<div className="flex flex-col items-center justify-center space-y-3">
+										{
+											previewURL ? (
+												<img
+													src={previewURL}
+													alt="Uploaded Image Preview"
+													className="h-30 w-30 object-contain rounded-lg"
+												/>
+											) : (
+												<span className="flex h-15 w-15 items-center justify-center rounded-full border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
+                                                                    <FaUpload />
+                                                                </span>
+											)
+										}
+										{
+											!previewURL &&
+                                            <p className="py-3">
+                                                <span className="text-primary">Click to upload </span> or drag and drop image *.png here
+                                            </p>
+										}
+									</div>
+								</div>
+								{
+									requiredImage &&
+                                    <span className="text-meta-1 text-sm absolute">
+                                                        Image is required
+                                                    </span>
+								}
+							</div>
+							
+							
 							<div className="my-4.5">
 								<label className="mb-2.5 block text-black dark:text-white">
 									Status

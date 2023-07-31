@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import APIService from "../../service/APIService.ts";
 import NoImage from "../../images/logo/black-and-white.png"
-import { FaRegPenToSquare } from "react-icons/fa6";
+import {FaRegPenToSquare} from "react-icons/fa6";
 import CreateSlide from "./CreateSlide.tsx";
 import EditSlide from "./EditSlide.tsx";
 import NoFile from "../../images/logo/no-task.png";
 import Loader from "../../common/Loader/index.tsx";
 import {StatusCodes} from "../../enum";
-// import {data} from "autoprefixer";
 
 function getURL() {
 	// @ts-ignore
@@ -27,7 +26,7 @@ const Slide = () => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const fetchData = () => {
 		APIService.get('slide').then((response: any) => {
-			if(response.status === StatusCodes.OK){
+			if (response.status === StatusCodes.OK) {
 				setSlide(response.data);
 				setLoading(false);
 			}
@@ -51,15 +50,16 @@ const Slide = () => {
 	const onCloseEditSlide = () => {
 		setOpenEdit(false);
 	}
+	
 	return (
 		loading ?
 			(
-				<Loader />
+				<Loader/>
 			)
 			:
 			<>
-				<CreateSlide show={open} onCloseCreateSlide={onCloseCreateSlide} createdSlide={() => fetchData()} />
-				<EditSlide show={openEdit} onCloseEditSlide={onCloseEditSlide} dataForEditSlide={dataForEdit} updatedSlide={() => fetchData()} />
+				<CreateSlide show={open} onCloseCreateSlide={onCloseCreateSlide} createdSlide={() => fetchData()}/>
+				<EditSlide show={openEdit} onCloseEditSlide={onCloseEditSlide} dataForEditSlide={dataForEdit}  updatedSlide={() => fetchData()}/>
 				<div className="mb-6 flex flex-col gap-3 sm:flex-row items-center">
 					<h2 className="text-title-md2 font-semibold text-black dark:text-white">
 						Slide
@@ -70,8 +70,9 @@ const Slide = () => {
 					<div className="max-w-full overflow-x-auto">
 						<div className="flex justify-between items-center mb-3">
 							<div></div>
-							<div className="inline-flex items-center justify-center rounded-full bg-primary py-2.5 px-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-5 xl:px-6 cursor-pointer"
-							     onClick={() => setOpen(true)}
+							<div
+								className="inline-flex items-center justify-center rounded-full bg-primary py-2.5 px-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-5 xl:px-6 cursor-pointer"
+								onClick={() => setOpen(true)}
 							>
 								Create New
 							</div>
@@ -106,26 +107,27 @@ const Slide = () => {
 							{
 								slides && slides.length > 0 ?
 									slides.map((slide: any, index: number) => (
-										<tr className="border-b border-[#eee] dark:border-graydark last:border-b-0" key={index}>
+										<tr className="border-b border-[#eee] dark:border-graydark last:border-b-0"
+										    key={index}>
 											<td className="py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
 												{
 													slides.length > 0 &&
-													<p className="text-sm text-black dark:text-white">
+                                                    <p className="text-sm text-black dark:text-white">
 														{index + 1}
-													</p>
+                                                    </p>
 												}
 											</td>
 											<td className="py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
-													<div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-														<div className="h-12.5 w-15 rounded-md">
-															<img
-																src={slide.name ? getURL() + '/public/images/' + slide.name : NoImage}
-																alt={slide.name} className="w-20" onError={onError} />
-														</div>
-														<p className="text-base text-black dark:text-white">
-															{slide.title}
-														</p>
+												<div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+													<div className="h-12.5 w-15 rounded-md">
+														<img
+															src={slide.name ? getURL() + '/public/images/' + slide.name : NoImage}
+															alt={slide.name} className="w-20" onError={onError}/>
 													</div>
+													<p className="text-base text-black dark:text-white">
+														{slide.title}
+													</p>
+												</div>
 											</td>
 											<td className="py-5 px-4 dark:border-strokedark">
 												<p className="text-base text-black dark:text-white">
@@ -133,9 +135,9 @@ const Slide = () => {
 												</p>
 											</td>
 											<td className="py-5 px-4 dark:border-strokedark">
-													<p className="text-base text-black dark:text-white">
-														{slide.ordering}
-													</p>
+												<p className="text-base text-black dark:text-white">
+													{slide.ordering}
+												</p>
 											</td>
 											<td className="py-5 px-4 dark:border-strokedark">
 												<p className="text-black dark:text-white">
@@ -171,7 +173,7 @@ const Slide = () => {
 														        }
 													        }
 													>
-														<FaRegPenToSquare />
+														<FaRegPenToSquare/>
 													</button>
 												</div>
 											</td>
@@ -182,7 +184,7 @@ const Slide = () => {
 									<tr>
 										<td colSpan={7} className="py-4 px-4 dark:border-strokedark">
 											<div className="w-full flex flex-col items-center justify-center">
-												<img src={NoFile} alt="No Slide" className="w-25 my-4 text-center" />
+												<img src={NoFile} alt="No Slide" className="w-25 my-4 text-center"/>
 												<p className="text-sm text-black dark:text-white text-center">
 													No Slide Found
 												</p>

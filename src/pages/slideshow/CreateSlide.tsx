@@ -54,14 +54,6 @@ export default function createSlide(props: MyComponentProps) {
 			theme: "light",
 		});
 	};
-	// useEffect(() => {
-	// 	APIService.get(`slide`).then((response: any) => {
-	// 		if (response.status === StatusCodes.OK) {
-	// 			setSlide(response.data);
-	// 			setLoading(false);
-	// 		}
-	// 	});
-	// }, []);
 	
 	const [selectFile, setSelectedFile] = useState<File | null>(null);
 	const [previewURL, setPreviewURL] = useState<string | null>(null);
@@ -69,6 +61,7 @@ export default function createSlide(props: MyComponentProps) {
 	const [requiredTitle, setRequiredTitle] = useState<boolean>(false);
 	const [requiredDescription, setRequiredDescription] = useState<boolean>(false);
 	const [enabled, setEnabled] = useState<boolean>(true);
+	// const navigate = useNavigate();
 	
 	const onClose = () => {
 		onCloseCreateSlide();
@@ -83,10 +76,10 @@ export default function createSlide(props: MyComponentProps) {
 	
 	const handleSubmit = async () => {
 		const imageValue = imageRef.current?.value
-		if (!imageValue) {
-			if (!imageValue) setRequiredImage(true);
-			return;
-		}
+			if (!imageValue) {
+				setRequiredImage(true)
+				return
+			}
 			const formData = new FormData();
 			const data = {
 				title: titleRef.current.value,
@@ -107,6 +100,7 @@ export default function createSlide(props: MyComponentProps) {
 						setSelectedFile(null);
 						setPreviewURL(null);
 						setEnabled(true);
+						
 					}
 				}
 			).catch(() => {

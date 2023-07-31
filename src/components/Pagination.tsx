@@ -38,7 +38,7 @@ function Pagination({ pagination, pages, searchKey, categoryId }: PaginationProp
                 totalPage < 7
                     ?
                     <>
-                        {Array.apply(0, Array(totalPage)).map((arr: unknown, i) => (
+                        {Array.apply(0, Array(totalPage)).map((_arr: unknown, i) => (
                             <React.Fragment key={i}>
                                 <li key={i}>
                                     <Link
@@ -156,7 +156,7 @@ function Pagination({ pagination, pages, searchKey, categoryId }: PaginationProp
                             </>
                             :
                             <>
-                                {Array.apply(0, Array(5)).map((arr, i) => (
+                                {Array.apply(0, Array(5)).map((_arr, i) => (
                                     <React.Fragment key={i}>
                                         <li key={i.toString()}>
                                             <Link

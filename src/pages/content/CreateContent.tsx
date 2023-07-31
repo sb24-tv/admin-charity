@@ -89,28 +89,42 @@ const CreateContent = () => {
             if (!category) setRequiredCategory(true);
             return;
         }
+        const formData = new FormData();
         const data = {
-            thumbnail: selectFile as any,
             name: nameRef.current?.value,
             categoryId: getId as number,
             description: description,
-            status: enabled,
+            status: enabled ? 1 : 0,
             userId: userId
         };
-        APIService.post(`content`, data).then((response: any) => {
-            if (response.status === StatusCodes.CREATED) {
-                notify();
-                navigate('/content');
-                setRequiredTitle(false);
-                setRequiredCategory(false);
-                setPreviewURL(null);
-                setRequiredImage(false);
-                setSelectedFile(null)
-                setEnabled(true);
-                setOpenId(0);
-                setGetId(0);
+        // APIService.post(`content`, data).then((response: any) => {
+        //     if (response.status === StatusCodes.CREATED) {
+        //         notify();
+        //         navigate('/content');
+        //         setRequiredTitle(false);
+        //         setRequiredCategory(false);
+        //         setPreviewURL(null);
+        //         setRequiredImage(false);
+        //         setSelectedFile(null)
+        //         setEnabled(true);
+        //         setOpenId(0);
+        //         setGetId(0);
+        //     }
+        // }
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('thumbnail', selectFile as any);
+        formData.append('status', data.status as any);
+        formData.append('userId' , data.userId)
+        APIService.insertFormData('content', formData).then((response: any) => {
+                if (response.status === StatusCodes.CREATED) {
+                    notify();
+                    navigate('/content');
+                    setSelectedFile(null);
+                    setPreviewURL(null);
+                    setEnabled(true);
+                }
             }
-        }
         ).catch(() => {
             notifyError();
         }
