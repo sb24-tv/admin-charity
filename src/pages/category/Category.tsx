@@ -108,7 +108,7 @@ const Category = () => {
                                 category.filter((item: any) => item.id == parseInt(getFirstCategory)).map((item: any, key: number) => (
                                     <React.Fragment key={key}>
                                         {
-                                            item.subCategories.length > 0 ?
+                                            item.subCategories.length  ?
                                                 item.subCategories.map((subcategory: any, index: number) => (
                                                     <tr className="border-b border-[#eee] dark:border-graydark last:border-b-0" key={index}>
                                                         <td className="py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
@@ -143,7 +143,7 @@ const Category = () => {
                                                         </td>
                                                         <td className="py-5 px-4 dark:border-strokedark">
                                                             {
-                                                                subcategory.status === true ? (
+                                                                subcategory.status? (
                                                                     <p className="inline-flex rounded-full bg-success bg-opacity-10 py-1 px-3 text-sm font-medium text-success">
                                                                         Active
                                                                     </p>

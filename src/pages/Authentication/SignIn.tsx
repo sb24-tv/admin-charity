@@ -1,5 +1,5 @@
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa6";
-import Logo from '../../images/logo/sb24.png';
+import Logo from '../../images/logo/charity.png';
 import { useRef, useState } from "react";
 import APIService from "../../service/APIService.ts";
 import { LocalStorageKey, StatusCodes } from "../../enum";
@@ -52,7 +52,7 @@ const SignIn = () => {
                     <div className="w-full p-10 flex items-center flex-col justify-center">
                         <img src={Logo} alt="logo" className="w-20" />
                         <span
-                            className="my-5 block font-normal  text-base max-md:text-sm justify-center text-center leading-6 text-gray-4">Thank you for get back to Admin User Guide, lets access our the best recommendation for your</span>
+                            className="my-5 block font-normal  text-base max-md:text-sm justify-center text-center leading-6 text-gray-4">Welcome to Admin Charity</span>
                         <div className="w-full">
                             <div className="mb-6 relative">
                                 <label className="mb-2.5 block font-medium text-gray-5 text-base dark:text-white">
