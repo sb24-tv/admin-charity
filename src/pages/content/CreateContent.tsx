@@ -8,8 +8,6 @@ import 'react-quill/dist/quill.snow.css';
 import MyEditor from "./MyEditor.tsx";
 import Loader from "../../common/Loader/index.tsx";
 
-
-
 const CreateContent = () => {
     const [selectFile, setSelectedFile] = useState<File | null>(null);
     const nameRef = useRef<any>(null);
@@ -97,25 +95,13 @@ const CreateContent = () => {
             status: enabled ? 1 : 0,
             userId: userId
         };
-        // APIService.post(`content`, data).then((response: any) => {
-        //     if (response.status === StatusCodes.CREATED) {
-        //         notify();
-        //         navigate('/content');
-        //         setRequiredTitle(false);
-        //         setRequiredCategory(false);
-        //         setPreviewURL(null);
-        //         setRequiredImage(false);
-        //         setSelectedFile(null)
-        //         setEnabled(true);
-        //         setOpenId(0);
-        //         setGetId(0);
-        //     }
-        // }
         formData.append('name', data.name);
         formData.append('description', data.description);
         formData.append('thumbnail', selectFile as any);
         formData.append('status', data.status as any);
         formData.append('userId' , data.userId)
+        formData.append('categoryId', data.categoryId as any)
+        
         APIService.insertFormData('content', formData).then((response: any) => {
                 if (response.status === StatusCodes.CREATED) {
                     notify();
@@ -144,12 +130,12 @@ const CreateContent = () => {
     }
     const handleFileChange = (event: any) => {
         setRequiredImage(false);
-        const file = event.target.files && event.target.files[0];
+        const file = event.target.files[0];
         if (file) {
             const fileName = file.name;
             const lastDot = fileName.lastIndexOf('.');
             const ext = fileName.substring(lastDot + 1);
-            if (ext === 'png') {
+            if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') {
                 setSelectedFile(file);
                 setPreviewURL(URL.createObjectURL(file));
             } else {
@@ -300,11 +286,11 @@ const CreateContent = () => {
                                 </div>
                                 
                                 <div className="mb-7 relative">
-                                    <label className="font-medium text-black dark:text-white">Image <span className="text-meta-1">*</span></label>
+                                    <label className="font-medium text-black dark:text-white">Image thumbnail<span className="text-meta-1">*</span></label>
                                     <div className={`relative mt-3 mb-2 block w-full duration-150 transition-all cursor-pointer appearance-none rounded border-2 border-dashed bg-input py-4 px-4 dark:bg-meta-4 sm:py-7.5 ${requiredImage ? 'border-meta-1' : 'border-bodydark hover:border-primary'} ${previewURL ? 'border-primary' : ''}`} >
                                         <input
                                             type="file"
-                                            accept="image/png"
+                                            accept="image/png, image/jgp, image/jpeg"
                                             ref={imageRef}
                                             className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
                                             onChange={handleFileChange}
@@ -326,7 +312,7 @@ const CreateContent = () => {
                                             {
                                                 !previewURL &&
                                                 <p className="py-3">
-                                                    <span className="text-primary">Click to upload </span> or drag and drop image *.png here
+                                                    <span className="text-primary">Click to upload </span> or drag and drop image *.png, *jpg or *jpeg here
                                                 </p>
                                             }
                                         </div>

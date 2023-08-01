@@ -72,8 +72,16 @@ export default function CreateSlide(props: MyComponentProps) {
     }
     const handleSubmit = async () => {
         const imageValue = imageRef.current?.value
-        if (!imageValue) {
+        if (!imageValue){
             setRequiredImage(true)
+            return
+        }
+        if (!requiredTitle){
+            setRequiredTitle(true)
+            return
+        }
+        if(!requiredDescription){
+            setRequiredDescription(true)
             return
         }
             const formData = new FormData();
@@ -110,7 +118,7 @@ export default function CreateSlide(props: MyComponentProps) {
             const fileName = file.name;
             const lastDot = fileName.lastIndexOf('.');
             const ext = fileName.substring(lastDot + 1);
-            if (ext === 'png' || ext === 'jpg') {
+            if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') {
                 setSelectedFile(file);
                 setPreviewURL(URL.createObjectURL(file));
             } else {
@@ -230,7 +238,7 @@ export default function CreateSlide(props: MyComponentProps) {
                                         
                                         {
                                             <div className="relative">
-                                                <label className="font-medium text-black dark:text-white">Image <span className="text-meta-1">*</span></label>
+                                                <label className="font-medium text-black dark:text-white">Image slide<span className="text-meta-1">*</span></label>
                                                 <div className={`relative mt-3 mb-2 block w-full duration-150 transition-all cursor-pointer appearance-none rounded border-2 border-dashed bg-input py-4 px-4 dark:bg-meta-4 sm:py-7.5 ${requiredImage ? 'border-meta-1' : 'border-bodydark hover:border-primary'} ${previewURL ? 'border-primary' : ''}`} >
                                                     <input
                                                         type="file"
